@@ -214,9 +214,14 @@ async function checkoutFromBag(n){
 /* Build N_QUESTIONS pairs from 2*N_QUESTIONS checked-out posts, pairing
    them off two at a time and randomizing left/right per pair. */
 function buildQuestionSet(posts){
+  // Pair posts by similar text length (not raw checkout order) so a very short
+  // post never gets shown next to a very long one -- that mismatch made one
+  // card visually dwarf the other. Which posts got checked out is still random;
+  // only the pairing-within-the-batch is length-aware.
+  const sorted = posts.slice().sort((x, y) => x.text.length - y.text.length);
   const qs = [];
-  for (let i = 0; i + 1 < posts.length; i += 2){
-    const p1 = posts[i], p2 = posts[i + 1];
+  for (let i = 0; i + 1 < sorted.length; i += 2){
+    const p1 = sorted[i], p2 = sorted[i + 1];
     const flip = Math.random() < 0.5;
     const a = flip ? p2 : p1;
     const b = flip ? p1 : p2;
@@ -231,7 +236,7 @@ function buildQuestionSet(posts){
       labelRight: b.label,
     });
   }
-  return qs;
+  return shuffled(qs);  // re-randomize question ORDER so it isn't shortest-pair-first
 }
 
 let questionSet = [];
@@ -394,7 +399,7 @@ function renderIntro(){
       <h1>Who gets in?</h1>
       <p>You'll see ${CONFIG.N_QUESTIONS} pairs of short posts written by different Reddit users,
       each with a note on when it was written. For each pair, pick the person you think is
-      <strong>more likely to be getting married soon</strong>.</p>
+      <strong>more likely to get accepted into medical school soon</strong>.</p>
       <ul>
         <li>There's no single "correct" answer &mdash; go with your honest first read.</li>
         <li>Posts are shown exactly as written, so spelling and formatting may vary.</li>
@@ -473,7 +478,7 @@ function renderQuestion(){
       <div class="brand">Reading Task</div>
       ${renderProgress()}
     </header>
-    <div class="question">Which person is more likely to get accepted into medical school?</div>
+    <div class="question">Which person is more likely to get accepted into medical school today?</div>
     <div class="subtext">Read what each person wrote and when they wrote it, then choose.</div>
     <div class="cards">
       <div class="card" data-side="left">
