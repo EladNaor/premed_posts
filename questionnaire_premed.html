@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who gets in?</title>
+<style>
+  :root{
+    --paper:#eef1ec;
+    --paper-raised:#f8faf6;
+    --ink:#1e2a24;
+    --ink-soft:#5b6b62;
+    --line:#c9d1c6;
+    --accent:#3f6357;
+    --accent-soft:#e3ece7;
+    --gold:#b98a3e;
+    --danger:#a34e3f;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  body{
+    display:flex; flex-direction:column; align-items:center;
+    min-height:100vh; padding:32px 16px 56px;
+  }
+  .wrap{ width:100%; max-width:760px; }
+
+  /* ---- header / progress ---- */
+  header{ margin-bottom:28px; }
+  .brand{
+    font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:14px; text-align:center;
+  }
+  .progress-track{
+    display:flex; gap:4px; width:100%;
+  }
+  .progress-seg{
+    flex:1; height:4px; border-radius:2px; background:var(--line);
+    transition:background .25s ease;
+  }
+  .progress-seg.done{ background:var(--accent); }
+  .progress-seg.current{ background:var(--gold); }
+  .progress-label{
+    margin-top:10px; font-size:13px; color:var(--ink-soft); text-align:center;
+  }
+
+  /* ---- question ---- */
+  .question{
+    font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+    font-size:22px; line-height:1.4; text-align:center;
+    margin:8px 0 26px; color:var(--ink);
+  }
+  .subtext{
+    text-align:center; font-size:14px; color:var(--ink-soft); margin-bottom:30px;
+  }
+
+  /* ---- cards ---- */
+  .cards{
+    display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  }
+  @media (max-width:640px){
+    .cards{ grid-template-columns:1fr; }
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 20px 20px;
+    text-align:left;
+    cursor:pointer;
+    display:flex; flex-direction:column;
+    transition:border-color .15s ease, transform .1s ease, box-shadow .15s ease;
+  }
+  .card:hover{
+    border-color:var(--accent);
+    box-shadow:0 2px 14px rgba(63,99,87,0.12);
+  }
+  .card:active{ transform:scale(0.995); }
+  .card.selected{
+    border-color:var(--gold);
+    background:var(--accent-soft);
+    box-shadow:0 2px 14px rgba(185,138,62,0.18);
+  }
+  .card.dimmed{
+    opacity:.45; cursor:default; pointer-events:none;
+  }
+  .card-label{
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:12px;
+  }
+  .card-time{
+    color:var(--gold); font-weight:600;
+  }
+  .card-text{
+    font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+    font-size:16px; line-height:1.55; color:var(--ink);
+    white-space:pre-wrap;
+  }
+
+  /* ---- footer controls ---- */
+  .status-row{
+    margin-top:24px; min-height:22px; text-align:center;
+    font-size:13px; color:var(--ink-soft);
+  }
+
+  /* ---- intro / consent screen ---- */
+  .panel{
+    background:var(--paper-raised); border:1.5px solid var(--line);
+    border-radius:var(--radius); padding:32px 28px;
+  }
+  .panel h1{
+    font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+    font-size:26px; margin:0 0 14px;
+  }
+  .panel p{ line-height:1.6; color:var(--ink); font-size:15px; }
+  .panel ul{ line-height:1.7; color:var(--ink); font-size:15px; padding-left:20px; }
+  .btn{
+    display:inline-block; margin-top:18px;
+    background:var(--accent); color:#fff; border:none;
+    padding:13px 26px; border-radius:999px;
+    font-size:15px; font-weight:600; cursor:pointer;
+    font-family:inherit;
+  }
+  .btn:hover{ background:#345349; }
+  .btn:disabled{ background:var(--line); cursor:default; }
+
+  /* ---- end screen ---- */
+  .end-icon{
+    width:44px; height:44px; border-radius:50%;
+    background:var(--accent); color:#fff; display:flex;
+    align-items:center; justify-content:center; font-size:22px;
+    margin:0 auto 18px;
+  }
+  .fine-print{ font-size:12px; color:var(--ink-soft); margin-top:22px; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script id="post-bag-data" type="application/json">
+[{"bag_id": 0, "orig_id": 13784, "text": "How many activities is too many?  For context: TMDSAS can have unlimited activities limited to 500 character descriptions. Per the website, the chronology must account for all time between high school until August 2024. As a nontraditional student, I have worked in over a dozen healthcare facilities in differing roles. This is in addition to non clinical employment, shadowing, volunteering, leadership, research, and awards etc. I am also applying AMCAS and will consolidate with the longer character count, or omitting some activities. Browsing through other posts and online forums the consensus is to list everything for TMDSAS. However, that would leave me with 25+ activities. How many activities is too many?", "time_ago": "2.2 years ago", "label": 1}, {"bag_id": 1, "orig_id": 23193, "text": "Has anyone heard from the University of Pittsburgh post lnterview? I know they are running things differently this year but has anyone heard from Pitt or does anyone know when we will be hearing post lnterview?", "time_ago": "2 months ago", "label": 0}, {"bag_id": 2, "orig_id": 8435, "text": "Any Chance at T10s With Almost No Research? I am a nontraditional student, late to switch to premed. I just recently secured a research position at a medical school, so I was able to put it on my application with 10 current hours and around 1300 projected hours for this next year. I should get a few publications in the next year. The research is on pediatric cancer. Ik T10s are heavy on research and love to see a lot of research done already, however, with a solid application otherwise and the guarantee of future research, is it still worth applying to these schools? I am still awaiting my MCAT score, but anticipate a 518 bare minimum with hopes for 520-525. I believe I have a unique story with a killer PS and decent EC.   \nStats:   \n\\- Male 23 ORM Ohio, B.S. Biology  \n\\- cGPA: 3.72 (180 credits)  \n\\- sGPA: 3.90  \n\\- MCAT: anticipating 520+  \n\\- GPA Trend: 3.95 last 100 credits  \n\\- ED Tech: 2600 Hours  \n\\- Server/Bartender: 2400 Hours  \n\\- Nursing Clinicals: 110 Hours  \n\\- Chemistry TA: 200 Hours  \n\\- Childcare Volunteer: 640 Hours  \n\\- College Group Leader: 350 Hours  \n\\- Research: 10 Hours (1300+ Projected)  \n\\- Shadowing: 22 Hours  \n\\- Hobbies: Running, Hiking, Liftingng, Hiking, Lifting", "time_ago": "14 months ago", "label": 0}, {"bag_id": 3, "orig_id": 4248, "text": "App Review: Should I retake my MCAT, where should I apply? Florida-resident, white female from a relatively low-income household, 3.95 GPA with the honors program at my school, 509 MCAT\n\n\\-2+ years of working as a medical scribe for the ER at about 30 hours per week\n\n\\-About 200 hours volunteering with hospice\n\n\\-A lot of organic chemistry research hours (working towards maybe getting a publication?) + some presentations of my research at the undergraduate research conferences at my school\n\n\\-A publication for a medical related research paper (however, don't think the journal was well known + not the primary author)\n\n\\-Leadership positions as a trainer for my job, a mentor for the honors program that I was in, a team leader in my research\n\n\\-currently working towards getting virtual shadowing hours?\n\n&#x200B;\n\nMy main question is if I should retake my MCAT. I feel pretty confident that I could get a higher score. My dog died the day before my testing date so I feel like that really affected me. My only thing though is I know the average for some of the schools I'm looking at (USA, FSU) are actually lower than my score. However, the main appeal for these schools for me are their location + their cost. I know that their rankings aren't as good as other schools in my state, and I don't know how much that is going to affect me later down the line considering the new P/F system of the step exams. Particularly, I think I would enjoy UCF or UF. I'm not sure if it would be better to invest the time and money to retake my MCAT to have a better shot at these schools, or if I would be fine applying with my current stats. I've been trying to prioritize saving money, trying to learn Spanish, + traveling for my own happiness during my current time, so that's the main reason I'm hesitant on retaking with this score.\n\nAlso, what other MD schools are realistic with these stats?", "time_ago": "4.0 years ago", "label": 1}, {"bag_id": 4, "orig_id": 9048, "text": "Miami's secondary screen Does anyone know anything about it? Like the first day of the month Miami sent an email saying they were going to decide whether or not they were going to send a secondary, but since then nothing. Now, I'm not complaining cause it gives me more time to work on other secondaries haha but I didn't think that they screened in the first place.\n\nPrevious applicants got any secret details?", "time_ago": "14 months ago", "label": 0}, {"bag_id": 5, "orig_id": 3879, "text": "Worth doing interview at Touro CA? I just got my II for Touro but also have an acceptance at MSUCOM, is it worth doing the interview? Based on the googling I've done so far, MSUCOM is a better school but also more expensive. If I get accepted at both, can I leverage that with MSUCOM to potentially give a scholarship?  \n\n\nWould appreciate any advice!", "time_ago": "3.4 years ago", "label": 1}, {"bag_id": 6, "orig_id": 14003, "text": "How is a first-gen and/or low-income applicant viewed? Is there any advantage or benefit that comes from the spoken experiences of these titles in the selection process? Yes, I\u2019d like to think so. But to what measurable degree? \n\nFor example, the lack of social toes to education may not generate the same opportunities as others with it. Supporting yourself through school is sometimes necessary at the cost of lower grades. Does an adcom overlook lack of experience and lower grades (e.g. 3.4 gpa)? Or is it subtly viewed as a lack of academic merit/experience? Genuine question.", "time_ago": "3 days ago", "label": 0}, {"bag_id": 7, "orig_id": 22701, "text": "Should I Even Try? I am a junior in college and a psych major. I have thought about going into med for years but I don't even know if it's possible for me.\n\nI have a 3.6 gpa and haven't taken the MCAT. I have no volunteer experience, shadowing, nor extracurriculars. I currently have two jobs, one as a retail pharmacy tech and the other is a regular retail job. I am missing several pre-reqs and have several course withdrawals. I also had a two year long experience of untreated mental disorder that nearly destroyed my life, hence the withdrawals. I am very anxious about aging (I'm currently 21) and want to be able to have a career for awhile before having a family. I am thinking about becoming a lab assistant, but it is psychological research. Additionally, I have the opportunity to perform my own research, but again, it is psychological research. \n\nI haven't taken the mcat or anything because I cannot afford to pump thousands of dollars into something if I have absolutely no chance. I feel like my GPA is too low and the absence of any relevant experience is detrimental. However, I'm scared I will regret the decision down the line.", "time_ago": "18 months ago", "label": 0}, {"bag_id": 8, "orig_id": 6311, "text": "Boston's vague secondary essay Seriously, what do they want?\n\n\"Please provide a narrative or timeline to describe any features of your educational history that you think may be of particular interest to us.\n\nFor example, have you lived in another country or experienced a culture unlike your own, or worked in a field that contributed to your understanding of people unlike yourself? Or, have you experienced advanced training in any area, including the fields of art, music, or sports? This is an opportunity to describe learning experiences that may not be covered in other areas of this application or your AMCAS application. It is not necessary to write anything in this section.\n\nAlso use this section to explain any impact that COVID-19 may have had on your educational/research/volunteering or employment plans.\"\n\nIt's so open-ended that idk which essay to throw in here. I have a covid essay, a diversity essay, a research essay, an \"I was rejected from everywhere last cycle because I applied last minute and didn't have anyone read my essays\" essay, etc. Any of these could feasibly fit in here. What direction am I supposed to go with this?", "time_ago": "22 months ago", "label": 0}, {"bag_id": 9, "orig_id": 12010, "text": "Has the gap year become more of a necessity than a choice? Med school applications are so competitive, I was told that I need an extra year to bolster my resume even with a 3.89 GPA , 100 hours of volunteering, 60 hours of shadowing, 100 clinical hours, and 70 hours of research. I also had a leadership role in my club and I tutor as well. I haven't taken the MCAT yet, but I have been advised to take a gap year to do more shadowing/clinical hours and get some \"real\" research (my current research hours are psychological research.\n\nI know a lot of pre-meds who say they need the gap year to bolster their resume. I understand some people want the gap year to take a break from school, but is it now a need?", "time_ago": "19 months ago", "label": 0}, {"bag_id": 10, "orig_id": 820, "text": "How do I choose a lab for junior/senior year? I am in a bit of a fortunate dilemma for junior year. I have gotten the opportunity to work in a few labs, but I want to narrow down as I study for MCAT and get more clinical hours. The three options are:  \n- Phage bio lab: Very nice and knowledgeable PI and friendly coworkers;, possible publication but haven't begun writing so timeline is unsure; worked unpaid for one school year and came in because a cool lab prof and his TA referred me to the lab. I've learned more than the 3rd lab, but the pace is a lot slower than lab 2. 50/50 wet lab and bioinformatics (and i hate dry lab though I recognize it as a necessary skill for biology in today's world)\n\n-herpesvirus lab at nearby institution: PI seems nice and helpful to me and the other undergrad, but apparently is not as liked by post-docs (some members are leaving or taking breaks soon); have gained more lab techniques and understanding of experimental design than the other two combined in just one summer full time; presenting poster soon; big name place and really cool labs nearby. All wet lab and tissue culture\n\n- \\[O2\\] Lab in the school of medicine and sponsored by Navy/Air Force; ok PI, kind of scatter brained and disorganized; my first lab and i worked in freshman year but took break in sophmore year because after the masters student left (cool mice dissection experiment that I enjoyed), the other masters students didn't do much, so the undergrads just did admin and housekeeping tasks (felt like i wasted the year); recently they are pushing a new project to collect data for a control group on an experiment. I enjoyed learning about the content, but never felt I was ever in a position to contribute meaningfully. \n\nI want to focus my career towards infectious diseases and research, so I want to keep the option of an MD-PhD open. I wish I had found the first two labs I listed earlier, because they fit so strongly with the story I want to tell. But I still want to have real, hard-evidence that I contribute meaningfully to research and actually learned something. I really have trouble distinguishing between the first two, and sometimes I feel outpaced by classmates doing clinical research and dry lab work, where it seems everything just works faster.", "time_ago": "23 months ago", "label": 1}, {"bag_id": 11, "orig_id": 14505, "text": "Should I apply DO or wait and see? Admit did not recommend applying DO which is why I am asking. I am also relying on the FAP to afford this cycle and any money I can save is very helpful. Should I wait until fall or just take the credit card debt?\n\nStats  \nORM cGPA 3.6 sGPA 3.59 strong upward trend\n\nMCAT 516 130/127/130/129\n\nClinical experience: MA 3500 hours\n\nShadowing: 100 hours \n\nClinical volunteering: 160 hours nursing unit\n\nResearch: 2300 hours 2 middle author Pubs\n\nNon-clinical volunteering: remote tutoring for underserved families 45 hours, cooking at a shelter 130 hours, Crisis textline 90 hours, Working with adults with IDD 20 hours.\n\nMisc: Biology and physiology TA, worked for a catering company", "time_ago": "3 months ago", "label": 0}, {"bag_id": 12, "orig_id": 5437, "text": "Anyone else think they would get more II? Okay so obviously there\u2019s still a lot more time to get II. But since we\u2019re nearing the end of October, I find myself feeling more and more hopeless about getting them. It feels like there\u2019s no way to feel like you\u2019re actually competitive and there are just soooo many applicants that so much of it is luck or something. I\u2019m a physician assistant with 4000 hours of research experience with a 3.93 and 514 MCAT. I paid someone to help me with my personal statement and some of my secondaries. I thought I would for sure have an easier time getting interview invites. I don\u2019t know what to think, I guess I was too confident in my competitiveness. I\u2019m so worried I\u2019ll have to reapply. Or maybe I\u2019m just being really neurotic.\n\nAnyway, I\u2019m sorry for the rant. Does anyone else feel like this??", "time_ago": "24 months ago", "label": 0}, {"bag_id": 13, "orig_id": 22498, "text": "How cooked am I? GPA: 3.15\nsGPA: 3.1\n\nI'm a 25 year old hispanic male. I have two degrees. I have a biology degree. I then got an accelerated BSN to become an RN.\n\nFor context, I initially wanted to do research, hence the biology degree. While it did fascinate me, I realized that I wanted to be in healthcare. While I entertained the idea of post bacc -> possibly med school, the quickest way to do achieve my goal was through nursing. I had all my classes taken that I needed to in order to go to the nursing program, so it seemed like the best route for me.\n\nHowever, after 2 years of CVICU nursing, I realize that I yearn for more. Nurses are great, wonderful even. A hospital simply cannot run without us. We are the back bone of healthcare. Nurses are very good at knowing the \"what\". However, they don't know the \"how\" or the \"why\". This lack of knowledge has really pushed me to pursue medicine. I wish to understand my patients fully and have the ability to push their treatments and care plans in a way that can help them the most.\n\n\"Why not NP\"? I know some people will be asking this question. Well, the simple answer is that they are only the second or third best options behind a physician. Whether you want to admit it or not, there is a clear hierarchy in the hospital. After 2 years of nursing, I realize that in order to have the greatest effect on my patient care is to become a physician. So, that is my reasoning on wanting to pursue this route.\n\nI know my GPA is abysmal. A saving grace is that I had an insane upward trend in my last 60 hours of school (which is my nursing degree). For instance, this time period I finished with a 3.5 GPA.\n\nI took a practice MCAT with 0 studying (it was half length test to figure out where I stood) and I scored a 495 which isn't good but considering its been years since I've taken some of these classes I think with a real studying plan I can get a respectable score. I am aiming for 510+, a high MCAT can help offset my low GPA.\n\nI have plenty of volunteering hours, as I regularly go to the soup kitchen to help serve food as well as volunteer at my church for retreats. Id say altogether I've accumulated around 500 volunteering hours within these last 2 years.\n\nI plan to span an entire year starting now to study for the MCAT, to rack top volunteering hours, as well as to search for research opportunities (aiming for around 100 research hours).\n\nAfter all is said and done, I will assess my position after my MCAT. If it's not where...", "time_ago": "14 months ago", "label": 0}, {"bag_id": 14, "orig_id": 17706, "text": "WAMC? 515 MCAT / 3.43 cGPA / 3.29 sGPA +somewhat  upward trend + research awards **Application Overview**\n\n**Undergrad:** T10 Undergrad notorious for grade deflation   \n**cGPA:** 3.40  \n**sGPA:** 3.28  \n**Last \\~60 credits:** 3.6 GPA  \n**MCAT:** 515 (130/127/129/129)  \n**Residency:** California  \n**Ethnicity:** URM   \n**First-gen, transfer, low-income background**\n\n**Research:**\n\n* \\~2,000 hours in microbial ecology and evolutionary biology\n* Independent honors thesis\n* Wet lab experience\n* Won a $5,000 independent research grant and a $2,000 general scholarship\n* No pubs yet, but preparing manuscript for submission\n* Presented at campus symposium and departmental honors review\n\n**Clinical Experience:**\n\n* 3 years (\\~1,000 hours) as urgent care medical assistant\n* 150 hours in student health clinic volunteering\n* Ongoing shadowing (\\~40 hrs so far, primary care + derm)\n\n**Nonclinical Volunteering & Leadership:**\n\n* 2500 hours STEM tutoring/mentorship (including low-income and ESL students)\n* Former peer mentor for a STEM program at CC\n* Strong focus on supporting underserved communities \n\n**Academic Story & Upward Trend:**\n\n* Early academic struggles (low grades + probation during first year 1.6gpa with an F), but rebounded \n* Took ownership of past performance no excuses\n* Transfer from community college with multiple honors I will also graduate with Honors\n* Full tuition covered at a top 10 university \n\n**Concerns:**\n\n* cGPA 3.4\n* No publications yet (but solid data + experience)\n\nWould love any WAMC-style feedback on my app, especially in terms of MD schools that value upward trends, research backgrounds, and nontraditional applicants. Also open to DO schools if they align with my research and service focus. Definitely open to any questions, critiques, or suggestions really appreciate the help!", "time_ago": "9 months ago", "label": 0}, {"bag_id": 15, "orig_id": 20807, "text": "More MMI Prep? Hi All,\n\nI was lucky enough to have several virtual MMI's last November, but since then had radio silence until I got another II for a virtual MMI next week. I went through a lot of MMI prep back in October and November, but what would y'all recommend for refreshing that?", "time_ago": "9 weeks ago", "label": 0}, {"bag_id": 16, "orig_id": 14610, "text": "What does the \"one year of\" requirement mean? Two part question having to do with the \"one year of biology with lab\" and \"organic chemistry with lab\" requirements.\n\nI go to a school on the quarter system.  For some strange reason, there are FOUR lower division biology classes: \n\n1. Evolution, Ecology, and Biodiversity*\n2. Cells, Tissues, and Organs*\n3. Introduction to Molecular Biology*\n4. Genetics\n\nAsterisk means the class has a lab component.\n\nEach one of these classes are 5 unit classes on the quarter system.  Most life sciences majors at my school have to take all four to get their BS degrees, but mine only requires numbers 2 through 4.  I figure 3 quarters is equivalent to 2 semesters is equivalent to 1 year of biology.  Unfortunately, my school does NOT have a premed advisor and everyone is telling me that I need to take all four classes to matriculate in med school.  I look at the USC's Keck School of Medicine  requirements and it actually says three quarters of biology with lab, which means I fulfill their requirements.\n\nRather than call up 30 schools and ask about this requirement, I am wondering if I have fulfilled the \"one year of biology\" requirement.\n\n\n\nSecond question: what does \"with lab\" mean?  Again, my school is a bit weird.  For my major, I took 12 quarter units of organic chemistry and 3 quarter units of organic chemistry lab, which should translate over to 9 and 2 semester units, respectively. Am I doing the math right here?", "time_ago": "14.3 years ago", "label": 1}, {"bag_id": 17, "orig_id": 9450, "text": "Second looks? Hey all, \n\nHow are you all approaching second looks? \n\nI have 5 MD A\u2019s (very grateful), and I live in a super rural area. Getting to any of these second look events is going to mean multiple days of travel and a pricey plane ticket (none of the schools are offering $ assistance as far as I know.) Three of the schools are in towns I have never been to. The events are weeks apart (ie I probably couldn\u2019t do one giant trip.) \n\nHow would y\u2019all recommend approaching this? Should I go to events for my top 2 schools? Should I not go at all? Or maybe I should do one round of travel and visit both schools, even if I\u2019m not hitting both second look events.", "time_ago": "8 months ago", "label": 0}, {"bag_id": 18, "orig_id": 3149, "text": "What schools to replace low yield schools with? I posted my school list a while back and someone rightly pointed out that there were a lot of low yield schools on there BUT since besides these schools have a heavy instate preference or are top schools, what do people replace low yield schools with?", "time_ago": "4.2 years ago", "label": 1}, {"bag_id": 19, "orig_id": 16764, "text": "Is taking a single premed req (physics II) at another 4 year institution okay? For context my school is notoriously terrible for physics outcomes/classes and all premeds dread taking it here. It\u2019s a T20, but if I take physics II at another four year institution (ie state school) would that be looked down upon? As if like I took the easy way out or something? Or would med schools not rly notice", "time_ago": "7 months ago", "label": 0}, {"bag_id": 20, "orig_id": 7244, "text": "Volunteering. Animal shelter/Town cleanup or Human-first service? Hi all, I'd appreciate some feedback on the decision I'm making. For some background, I am an applicant this cycle and have been fortunate enough to get 2 MD IIs so far. To me, the very clear weak spot in my application is lack of community service. In fact, I have 0 of it. I volunteered as an EMT instructor at my old program but that's about it for volunteer experience. \n\nMy issue is, I talk a lot about wanting to serve my community as a physician. And that's true, that is something I care very deeply about, but I don't have much to show for my words. Anyways, I have some extra time in my schedule that I can put towards volunteering and I was wondering what opportunity might best fill the gap in my application. I think I would have a lot of fun volunteering at my local animal shelter / doing town-based activities like cleanups and gardening etc., but I'm worried that those activities don't directly involve doing service towards *people*. Am I being overly pedantic or is this justified? On the other end, I could try something like volunteering for a soup kitchen, something with a more human-first focus to really back up my commitment to the underserved. I feel it could give me a better message when I write an update letter to schools, and help round out my application better than other community service. \n\nTo summarize, I would probably enjoy the non-human volunteering (gardening/animal shelter) more, but I think the human volunteering would fit better with what I've talked about in my applications so far. \n\n  \nPlease let me know any thoughts in the comments below! Feedback greatly appreciated!", "time_ago": "7 months ago", "label": 0}, {"bag_id": 21, "orig_id": 15279, "text": "Has anyone applied with a drastically higher sGPA than cGPA? Second semester junior right now (graduating next fall). Freshman year I failed a bunch of classes due to personal circumstances and having to leave school early but missing the withdrawal period. I wasn't pre-med then so I basically just failed a bunch of easy intro courses. In fact, the only courses I didn't fail were a two science courses I took for fun because they were exam-based while the others were participation and group project-based.\n\nFast forward a year, I returned to school after sorting out my personal stuff and decided I wanted to be pre-med and took pre-med reqs. I maintained straight As in all my coursework and also retook the classes I failed and got As. With the way my grades are going, my sGPA is looking to be >3.8 while my cGPA will be \\~3.0-3.2 (because AMCAS factors in retaken grades).\n\nHow would this affect my application? I know a low 3.0 GPA would make me extremely uncompetitive for any school. \n\nI don't even know how to go about this GPA. Post baccs and SMPs seem to be focused on raising sGPA and getting pre-med requirements done, but I'll have finished all my pre-med requirements by the time I graduate. And my cGPA is the issue, not my sGPA.", "time_ago": "20 months ago", "label": 0}, {"bag_id": 22, "orig_id": 17257, "text": "Advice on the Research I am Currently in as a 1st Year Undergrad? Hi guys, I am a first year undergraduate majoring in biochemistry. Towards the end of my first semester, I was able to join a research lab. Now, the thing is, they do not do medical research, and instead it is mosquito research and how to improve insecticides.\n\nI was wondering a few things. Firstly, should I at some point join a different lab that pertains more to the medical field (to make my application stronger, and because I am interested in a few other areas). Also, how long should is it recommended I stay in the lab? Obviously I am just starting and am eager to contribute to the research. However, I hope it is okay that I treat this like a stepping stone and a way to learn instead of it being that I have to do it all 4 years of my undergrad. And if I were to leave at some point, how would I announce that down the road? I am really grateful for the opportunity they gave me as a freshman, and I want to be as respectful and professional as I possibly can.", "time_ago": "19 months ago", "label": 0}, {"bag_id": 23, "orig_id": 13864, "text": "School list guidance (too top-heavy?) for low GPA, high MCAT, high clinical fella tryna maybe not go bankrupt on applications Hey lovely people I'm here hoping to get some guidance as I finalize my school list; I'm exceedingly poor rn and am trying to minimize money loss as much possible (maybe keep school list down to 25), so would love some guidance on my current list. Right now I'm very worried it's too top-heavy (but at the same time it seems like the so-called \"low\" tier schools are all very in-state biased or niche focused so I wouldn't be a good focus for many of them anyway hmmm) so feel free to be brutally honest and lmk if I need to readjust (any and all suggestions welcome). \n\nMy main factor for a school is location lol I'm a city boy and would love to keep it that way (having done several years in rural EMS, I might wanna get back to it one day, but for school I'd love a city) but other factors I care about are p/f curriculum and ideally a real cadaver lab so any suggestions keeping this mind are especially welcome\n\nAbout me:\n\n25M white 3.67 uGPA, 3.6ish sGPA (hard to calc but B- in both orgos hurt), dual major stats and biology from T5 public school (idk if this even matters lol) currently VA resident but ties to PA (specifically Philly & Lehigh valley) 520 MCAT (131, 131, 130, 120 idk if breakdown matters)\n\nClinical paid hours: \\~3500 + 1400 anticipated (cardiac technician/exercise physiologist) + 2200 (ER tech at rural level II trauma) + 750 + 1800 anticipated (ER tech/specialist at Pediatric level I trauma) + 875 (EMT-B in busy urban 911 system = \\~7200 clinical hours\n\nClinical volunteering: \\~3100 hours volunteer EMS (became a preceptor/captain in rural EMS setting, think I wrote a decent most meaningful for it, but worried bc these hours all come from one item)\n\nNon-clinical volunteering hours: 30 + 200ish anticipated (homeless shelters for both unhoused families/children as well as individuals) + 90 + 120 anticipated (animal shelter/rescue, I do animal care and transport food/goods to elderly pet owners, but I'm worried AdComs might see this one as a stretch) + 55 (various community volunteering in my old rural EMS area) = \\~ 175 non-clinical\n\nResearch: 960 hours in a microbio (wet?) lab working with E. Coli and other enterobacteria in mice; no pubs and this was almost 6 years ago so idk how much I can talk about this in an effective way tbh + 120 hours assisting (mostly via stats/R) in a kinesiology PhD project (again worried this might...", "time_ago": "10 months ago", "label": 0}, {"bag_id": 24, "orig_id": 17066, "text": "Similar hobbies? Let\u2019s say both you and your friend are applying the same cycle and both have similar activities to a certain extent. Let\u2019s say both you and him wanted to put 3D printing (this is true), but your friend tells you that ADCOMs are gonna see the similarities and reject both of us. What would you say and do?", "time_ago": "7 weeks ago", "label": 0}, {"bag_id": 25, "orig_id": 13073, "text": "Can a high mcat truly mitigate a lower gpa? Hi! I\u2019m about to be a junior at a \u201clittle ivy\u201d and have about 500 clinical + shadowing hours and tons of ecs. My gpa currently is a 3.7 (all As besides Cs in orgo \ud83d\udc94) and i\u2019m planning on getting it up to a 3.8 by the end of my junior yr when I apply (so next cycle). Im studying for the mcat rn and am consistently getting above a 515 on my practice exams since I\u2019m aiming for anything 520+. I just wanted to know  everyone\u2019s opinions on t30 and t20s with gpa. I\u2019m working on finding research but hopefully should have a yr of experience by applying. Im also ORM in stem so maybe it is cooked but plz lmk!", "time_ago": "4 weeks ago", "label": 0}, {"bag_id": 26, "orig_id": 9854, "text": "Can't tell if my uchicago app is submitted or not? https://preview.redd.it/j4pay1t33k9d1.png?width=1378&format=png&auto=webp&s=ec16a3e3cdedb8339145e549bced0fd893cb0ed7\n\n[The application portal shows that the Letters of References are not submitted, but the references page shows that 5 letters have been received. Does anyone know what's going on?](https://preview.redd.it/ucfdm1t33k9d1.png?width=1732&format=png&auto=webp&s=8225762f265a5f3e6a0dbb8b0c0f4aa80747be26)", "time_ago": "24 months ago", "label": 1}, {"bag_id": 27, "orig_id": 5849, "text": "Med school list/ Got Scores Back\ud83d\ude2d/Thoughts? Just got 2nd MCAT score back today, haven\u2019t submitted primaries yet and want advice. I think im applying no matter what, im fine with applying DO, prefer MD (but i do see my MCAT Scores). Financially able to cast a broad net to have a slight chance, willing to apply to 25-30 schools)\n\nTexas Resident, Strong Ties to Oklahoma, ORM\n\ncGPA: 3.94\n\nsGPA: 3.91\n\nMCAT: 494 (125, 122, 121, 126)\n503 (124, 124, 126, 129)\n-This test is a beast and id reallly not like to put myself through this again but i know its a sad score. It doesnt reflect my SAT, ACT, college tests, or anything. (but its still bad i know)\n\nUndergrad: Well-known State School\n\nResearch: 650 hrs, 2 poster presentations at college events, 0 publications (microbio with clinical ties)\n\nPaid clinical: 175 hrs scribing (going back to do more)\n\nOther Employment: 100 hrs, babysitting\n\nClinical Volunteering: 20 hrs (going back to do more)\n\nNon-Clinical volunteering: 355 hrs (food pantry, humane society, church camps, mission trips etc.)\n\nShadowing: 150 Hrs, 6 specialties total, 80 hrs from summer internship program\n-I have 28 hours with PAs in 2 different specialties but didn\u2019t include in the 150 total\n\nAwards: Two major honors from university (top 25 students kinda recognition senior year, holistic review of grades, story, involvement)\n\nLeadership: 10 activities on TMDSAS, 2 in organizations with 500+ hours involvement.\n\nExtracurriculars: 1,700 hrs (medical, cultural and social clubs, leadership activities, so many things)\n\nOther notable things: Religious studies minor, heavy focus on cultural awareness and experiences in my app\n-Meaningful experiences are Mission trip, summer internship, and involvement in an organization\n\nLet me know if you need more info!\nCurrent thoughts:\nMD:All TX schools Minus Baylor, UTSW, Tech El Paso\n-OU, AWSOM, (need help with more OOS MD schools)\nDO:\n-TCOM\n-ARCOM\n-OSU COM\n-VCOM Auburn\n-Rocky Vista Colorado?\n(open for more, i should probably have more to have an reasonable spread)", "time_ago": "14 months ago", "label": 0}, {"bag_id": 28, "orig_id": 11067, "text": "Texas A&M accept cc courses? I graduated a 4 year university with a BS degree a few years back and during this cycle realized I needed 1 more bio lab credit to meet the prerequisites. So I signed up for an intro biology + lab course at a local cc to fulfill the req. \n\nAccording to MSAR it says TAMU doesn\u2019t accept supplemental cc courses. But their website doesn\u2019t say the same.\n\nI\u2019ve emailed their admissions a while back and didn\u2019t get a response.\n\nDo you think they would accept this one credit? I took all other prereqs at my university prior to graduation, just missed needing 1 more bio lab credit.", "time_ago": "7 months ago", "label": 0}, {"bag_id": 29, "orig_id": 19577, "text": "Interfolio Upgrade Required? Is it necessary to spend the $60 for the Interfolio upgrade just so I can send AMCAS and AACOM my LORs? I don't see any mention of the upgrade in LOR submission guides... **\ud83e\udd72**", "time_ago": "8 weeks ago", "label": 0}, {"bag_id": 30, "orig_id": 10695, "text": "Should I sue my MCAT testing center for discrimination? genuinely need legal advice bc this is actually fucked and nobody is taking me seriously\n\ntook the MCAT on saturday after studying for 6 months. been averaging 520-522 on all my practice tests, have a 3.98 gpa, basically a lock for T10 schools\n\neverything was fine until the CARS section when my proctor INTENTIONALLY walked by my station and coughed. like full on hacking cough right next to my head. completely destroyed my focus on a passage about some philosophy bullshit\n\nheres the thing - i noticed he did NOT cough near any of the other test takers. i was the only indian guy in the room and im pretty sure this was targeted\n\ni lost focus for like 30 seconds which doesnt sound like a lot but on the MCAT thats literally 2-3 questions. could be the difference between a 522 and a 518. a 518 might not even crack T20\n\nfiled a complaint with AAMC and they basically laughed at me. said \u201coccasional coughing is normal in testing environments\u201d but they dont understand that the TIMING was suspicious as fuck. also it wasnt occasional it was ONE TIME directly at ME\n\nmy parents are both doctors (dad went to Hopkins, mom went to Penn) and they think im being paranoid but theyre immigrants who dont understand microaggressions and implicit bias in academic settings\n\ncalled the testing center directly and the manager was super dismissive. i asked to see the security footage to PROVE the proctor only coughed near me and she said they \u201cdont release footage for complaints like this\u201d\n\nlike\u2026 what are they hiding???\n\nmy premed advisor said i need to \u201clet it go and focus on the next cycle\u201d but she got a 508 on her MCAT so clearly her bar is way lower than mine. also shes white so she literally cannot understand what its like\n\nretake costs $320 which is bullshit bc i have to pay again because of THEIR proctor. my roommate said \u201cjust wait for your score\u201d but he got a 502 and is applying DO so his opinion is irrelevant\n\ntalked to a lawyer consult (my uncles friend) and he said i dont have a case but he also does real estate law so what does he know about civil rights\n\nam i crazy or is this actually worth fighting? my future is on the line here\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b\u200b", "time_ago": "5 months ago", "label": 1}, {"bag_id": 31, "orig_id": 16358, "text": "Is there even a point in me applying? Hi all,\n\nI plan on applying MD, I was hoping to get some insight onto whether or not my application is competitive, as I do plan on applying this cycle come May, thanks.\n\nGPA: 3.94, est. 3.96 by application submission\n\nMCAT: 511\n\n**Clinical:**\n\n1. 600 hours scribing\n\n**Volunteering:**\n\n1. \\~250 hours at a food bank\n\n2. \\~150 hours doing youth mentoring with justice-involved youth\n\n**Shadowing:**\n\n\\~150 hours across 3 specialties: Cardiology, Dermatology, & Nephrology, observed several surgical procedures over the course of this time. \n\n**LORs:**\n\n2 out of my 3 LORs I am absolutely sure are very strong, as one was literally written by me and another by a family friend who I took several classes with. The 3rd one I am also quite sure will be strong as though I've only taken 1 class with the teacher I have been told she writes good letters. \n\n**Misc.:**\n\n1. Part of a Campus Hospital Health Ambassador program, consists of giving hospital tours to highschoolers interested in the medical field\n\n* I hold a VP of Philanthropy & Service position here, so I have helped with creating, structuring, and organizing volunteer opportunities for students on campus as well as for highschoolers\n\n2. Created a campus-affiliated club in association with the youth mentoring nonprofit I work with to increase engagement and awareness with the student body\n\n**Hobbies:**\n\nSeveral hours spent playing guitar & tennis\n\n\\-----------------------------\n\nThe rest of this post is an emotional vent as a result of receiving my MCAT score back today, so feel free to ignore lol.\n\nI am very disappointed in myself tbh, with an average of 515 and my last FL being a 521 I'm quite upset that I dropped so heavily. I can't help but feel subpar with a score like this, and even moreso with the hours of my ECs, which I feel even calling it subpar is a stretch seeing the thousands of hours many people here have dedicated to all their ECs. \n\nI really, really do not want to have to take a gap year, but now I'm not so sure.\n\nAm I competitive for MD? is there even a point applying to any t30 or better with stats like these? not to sound like a broken record but I cant help but feel overwhelmingly mediocre. Thanks in advance for any advice, I'd really appreciate it.", "time_ago": "3 months ago", "label": 0}, {"bag_id": 32, "orig_id": 4930, "text": "Pros and cons between MD/PhD and research-intensive MD programs? I\u2019m applying to a mix between MD/PhD programs and 5-6 year MD-only programs (with the possibility of getting a master in biomed research) this cycle. As I\u2019m having an interview soon for a research-intensive program, I want to ask about the pros and cons between these programs from your perspectives. I know one of the most obvious reasons is the financial incentives giving the more years you spend doing school work, the more years of attending salary you lose. But casting financial reasons aside, what are some other good pros and cons of each program? \n\nHere are some things I can think of:\n\nMD/PhD pros: learn how to properly formulate and carry basic/translational research projects that require lots of time to do; more training for stuffs like grant writings; more competitive for research job market\n\nMD/PhD cons: can have a dissonance between the bench and lab training given long time being away from the clinics during PhD training\n\nResearch MD pros: more integrative of the clinical training (at least at the program I\u2019m interviewing) during research years while still able to run longitudinal basic/translational projects\n\nResearch MD cons: less basic research extensive and research productivity, slightly less competitive if wanting to pursue research as PIs \n\nI would love to hear more from your perspective.", "time_ago": "7 months ago", "label": 1}, {"bag_id": 33, "orig_id": 23613, "text": "Should I take a gap year? I\u2019m going to be a junior in college this coming school semester and I currently have a 3.3 gpa, 100+ volunteer hours, started working as a medical scribe, on the e-board for Red Cross club this semester and planning to take a MCAT next year. I\u2019m extremely unconvinced I\u2019ll be able to get into med school, no matter how many times I try lol. I am first generation and my family is also low income. I already paid for the one year MCAT study plan and it would be a waste of money if I didn\u2019t get in. It\u2019s also crazy that we have to pay hundreds of dollars just to take the test and I also don\u2019t want to waste that money just to not get in. I\u2019m incredibly stressed about this dilemma lol. I know a lot of pre med students go through this but I just need a boost of morale or some sort of help/advice from people. I really need it \ud83d\ude2d. I want to start research but it\u2019s hard to get into the research at my school. I also want to start shadowing but again, it\u2019s hard when people don\u2019t answer their emails. I wish I could redo my past 2 years of college. I made a lot of mistakes I wish I could fix and go back to. I normally am able to move past these things but this is a big part of my life I have looked forward to for years and now that it\u2019s creeping closer, I honestly feel so pessimistic about everything.", "time_ago": "11 months ago", "label": 0}, {"bag_id": 34, "orig_id": 8975, "text": "Would this plan work? (Long post) First disclaimer: I am very hopeful for this cycle, but with my application, objectively it would be reckless to not be planning for a reapplication. \n\nSo, I have already applied and as of now, im working on if I have to reapply in a cycle or two (since this one im doubtful on). Graduating in 3 years, so I applied with 2 years of college and this year ill be taking 15-18 credit hours (1st semester i\u2019ll have more time tho cuz one class online).\n\nWhat I\u2019m doing currently/finished:\nSummer: finished 100more hours clinical, 50hours more clinical research with another paper submission prepped, 50 hours more soccer volunteer coaching all finished\n\nDuring semester:\nContinuing clinical research (not full time role)\nContinuing my teaching assistant role for anatomy through the college of medicine\nStarting new anatomy research role (educational, so builds off my anatomy minor and teaching assistant role; mainly proctoring, statistical work, analysis)\nContinuing Vice president of a club (non medical)\nContinuing weightlifting/bodybuilding hobby/EC (cant give this up as its my personal time and lifesaving thing of mine)\nAnatomy outreach program (for groups that need educational help/ spend time learning with community)\n\nHere\u2019s the concern: my biggest red flag i\u2019ve been told by so many people is my hours of clinical and nonclinical stuff. As it stands i have 215 hours clinical service and 225 hrs nonclinical community service (at this cycle start i was at 100 direct clinical and 175 hrs non clinical volunteering; tho everyone on sdn and some threads here say volunteer coaching is not true service).\n\nWith that said, I really cannot commit to a clinical job right now, and i cant volunteer at my campus hospital or free clinic because their spots are full for the interactive stuff/ desk help like guidance and manning a desk isnt actual interaction. \n\nIm thinking on top of the stuff I\u2019m already doing I\u2019m going to offer tutoring to k6-12 schools in my area for free to students who need it. I dont want to check boxes for community service that is toward underserved populations, but I enjoy teaching as an anatomy TA so i figured tutoring would help me with my passion for teaching. Then, after I graduate I\u2019m planning to apply for MA or PCA positions if this cycle goes poorly (which is my expectation). I have the belief that if this cycle doesnt go well I wont be ready for next cycle, so I\u2019ll be trying to work a clinical job and be ready for the 2...", "time_ago": "5 months ago", "label": 1}, {"bag_id": 35, "orig_id": 22582, "text": "retaking a class? I have a dual enrollment D in precalc from high school. I was wondering if i retake it, will it get replaced for med school apps? does it even matter if it was not taken during college? the d was in a local community college.  \n  \n im also deciding between going that cc and doing enough credits to qualify for academic renewal and transferring or going to a 4-year.", "time_ago": "2 months ago", "label": 1}, {"bag_id": 36, "orig_id": 7743, "text": "Is software engineering as great as everyone says it is? Hey everyone. \n\nI've always wanted to go to med school MCAT has been stressing me hard and I see these software engineers making 250k+\n\nIs it really as great as everyone says it is? I am NOT considering switching careers; I've invested way too much. \n\nBut is it really the great career everyone says it is now? Maybe I'm spending too much time on tiktok\n\nEDIT\nThank you everyone for your comments! I'm NOT considering switching careers or anything. Just wondering if its really as lucrative as everyone says", "time_ago": "3.8 years ago", "label": 1}, {"bag_id": 37, "orig_id": 10792, "text": "So how does deferring actually work? Really grateful to have acceptances to multiple programs, but my long term bf is applying next cycle. Let's say I have an acceptance to a program in Philly and Chicago right now, could I (assuming the schools let me) defer both schools, wait for my bf's cycle, and then make a choice based on where he gets in? Or is deferring only allowed after like May 1st or whatever that date is when you must narrow it down to one school, so at that point you've already committed someplace and withdrawn acceptances to other schools? Thanks for your help guys!", "time_ago": "4 months ago", "label": 0}, {"bag_id": 38, "orig_id": 19609, "text": "Just starting on this journey, could you help me understand this please? Hi,\n\nStill in undergrad sorting my way through how to conquer all the pre-med pre-reqs, MCATS, clinical hours, research, volunteering, etc.etc.etc. When people talk about the number of research hours and whether they are mid authors, first authors, pubs, posters, etc. What exactly does that mean? I know that in a professor's research lab at school your work will help contribute to the body of knowledge of the topic your professor is researching. I assume along the way your professor is publishing their findings at various stages of the project. Sometimes you may accompany your prof to conferences, etc. where you might get a chance to present some of the research. What are the different types or categories of being \"published\"? If you are creating a manuscript for your prof or a poster, etc. are you included as an author? I know some students will have the opportunity to do independent research on their own topic funded by their own school...I assume those folks also hope to publish their findings in a peer reviewed journal, etc. It all just seems very overwhelming to sort through as a person not coming from a medical family.\n\nThanks!", "time_ago": "2 weeks ago", "label": 0}, {"bag_id": 39, "orig_id": 4079, "text": "Secondary App Timing? 2 week rule? Hi everyone! I've been trying to plan a trip out of the US this summer but want to make sure I get all my secondaries submitted before I go. I plan on submitting my primary on the first day possible (05/30) and will pre-write as many secondary essays as I possibly can. I plan on applying to \\~25 schools, including some t20's. My trip was originally booked for July 15th-23rd, but I'm worried this will set me back on secondary submissions with the \"2 week rule\" some people suggest, as I've heard they start coming in early July. How quickly did you get your secondary applications after you submitted your primary? Do you think I should postpone my trip to give myself more time? Thanks for the feedback!", "time_ago": "3.1 years ago", "label": 1}, {"bag_id": 40, "orig_id": 22400, "text": "MCAT VS GPA? Can one offset the other ? This will probably look like a dumb question but I\u2019m genuinely asking because I heard from the pre-med advisor at my school that MCAT and GPA are practically equally rated. \n\nFor context: I scored a 527 on my MCAT on my first try but I have a pretty okay-ish gpa. I\u2019m unsure what my cumulative gpa is but besides my first semester of college (2.9), I\u2019ve had a 4.0 gpa every single semester since then and I\u2019m a junior. I took all my pre-reqs + some. Most of my classes are pretty advanced stem classes and I think (and hope) it offsets that rough first semester. I know my first semester was terrible but that\u2019s when I got diagnosed with ADHD and since then I was pretty locked in. \n\nMy advisor says I shouldn\u2019t put too much hope in my MCAT score and that my first semester gpa will impact my future choices, even if it is \u201cminimal.\u201d", "time_ago": "4 months ago", "label": 0}, {"bag_id": 41, "orig_id": 19082, "text": "How do i reach out to my old PI to ask her to redate a LoR? Hello everyone! My school offers a committee letter evaluation  which requires letters of recs and essentially doing the whole med school app specifically for them. \n\nLast year, I was planning on applying but didn\u2019t get the minimum score I needed of the MCAT to do the CLE so i held off another year and now am in the midst of reapplying. The thing is- i received my LoRs prior to realizing I couldn\u2019t continue and forgot to reach out to my writers and let them know I wasn\u2019t continuing in the application. \n\nI love my old PI and she and I do have a good relationship but I feel bad asking her to even just redate the LoR since I haven\u2019t been in contact with her since May (i did thank her after she initially wrote it). Am I overthinking this or is there a way i should phrase this? \n\nOther note: our relationship is casual enough that my first ask was over text and I was planning on doing that again but I don\u2019t know if i \u201clost\u201d that privilege after not staying in contact for this long", "time_ago": "6 months ago", "label": 0}, {"bag_id": 42, "orig_id": 10452, "text": "Starting prereqs as a Non trad with a C. Help?  Well that\u2019s about it. My first prerequisite will almost definitely be ending with a solid 79.6% in organic chemistry 1. I have a bachelors in psych, finished 4 years ago rough estimate gpa 3.5 sgpa 3.2, need to take ochem 2, physics, biochem, probably a couple math classes to get into physics. I\u2019m paying for this on my own, working full time in a burn icu (10 years as a CNA in CVICU/BICU) barely paying bills. This is fucking hard. Will it be worth retaking at some point? I\u2019m not giving up just because of this, but I\u2019m super frustrated. Words of encouragement please.", "time_ago": "18 months ago", "label": 0}, {"bag_id": 43, "orig_id": 1449, "text": "Am I missing any ECs? I feel like I should shadow more, or do something other than volunteer firefighting. I have about a year left 'till I apply Work\n\n* EMT (300 hrs)\n* Direct care worker (100 hrs)\n* TA (100 hrs)\n\nClinical Volunteering\n\n* EMT (100 hrs and counting)\n* ER volunteer (65 hrs and counting)\n\nNon-Clinical Volunteering\n\n* Waiting to hear back from fire station\n\nOther\n\n* Research assistant (500 hrs, no pubs/posters)\n* Shadowing an ENT (10 hrs)\n* D1A rugby (300 hrs)\n* AED (running for officer position, wish me luck)\n* Society of Physics Students (vice president)", "time_ago": "4.7 years ago", "label": 1}, {"bag_id": 44, "orig_id": 10936, "text": "Transcript? Okay might be a dumb question but its my first time applying. I just ordered and paid like 13$ online to my school and they already sent my transcript to aamc in like fifteen minutes. I have seen people be like order transcripts early..what does that mean then if online transcripts only take minutes? Am i missing something :(", "time_ago": "6 weeks ago", "label": 0}, {"bag_id": 45, "orig_id": 20410, "text": "Advice: drop the minor or keep it? (for my final semester of college)  Title. I've been told by premed advisors that they genuinely do not care at all. I thought it could add nuance because im double majoring in 2 science majors but would minor in humanities. But I was also mainly thinking that if I genuinely find joy in it, I might as well, and hopefully in interviews I could just go absolutely crazy emphasizing it and the value it's brought to me. i only have 2 classes left.\n\nThis was my ultimate plan to just add it in, but now I'm also thinking that for my 2nd semester of senior year, I'll also be retaking the MCAT and writing my personal statement /secondaries to submit in May. It would be the difference between taking 3 classes next semester or 5. The extra two are thoroughly reading and writing but i do love it... im just struggling of if i want to priortize my career (drop the minor if it really is useless) or my happiness.. tho one could also argue i would be happier with less work lol. I would seriously appreciate any advice! you can be so blunt i just need someone to tell me officially what to do[](https://www.redditinc.com/policies/user-agreement)[](https://support.reddithelp.com/hc/sections/38303584022676-Accessibility)", "time_ago": "7 months ago", "label": 0}, {"bag_id": 46, "orig_id": 123, "text": "What are everyone's thoughts on mentions of trauma in an application? So I've noticed a few posts on here touch on the idea that mentioning a history of trauma (i.e., child abuse, domestic violence, mental illness) is a big no-no on med school apps, even when it's done to describe someone's path to medicine or explain a discrepancy in academic performance. On the other hand, it seems like some applicants do write about these things for these reasons, and they end up gaining admission.\n\nThe main reason I'm asking for everyone's opinion on this is that I'm having a less than stellar cycle (2 II's \u2013> 2 WL/DD, I wrote the full story [here](https://www.reddit.com/r/premed/comments/11hm30o/just_hoping_for_a_little_app_cycle_guidance/) lol) and it wasn't until I saw someone's [similar](https://www.reddit.com/r/premed/comments/12cagr3/frustrated_with_the_process_high_stats/) type of \"not perfect but did most things right, where'd I go wrong?\" post that had a lot of comments on how the fact that the applicant mentioned their child abuse might have doomed their app, that it dawned on me that might've been where I went wrong as well.\n\nI'm gearing up for a reapp now, and I'm just wondering if I should avoid mentioning anything about abuse/DV/mental illness in my future application b/c of this bias? I thought if you mentioned it but then were heavy on what you learned, how you grew, how it led you to medicine, etc. that it was okay, but it seems like many believe that even so it can significantly damage an app. One commenter on that post mentioned *\"Remember that their bread and butter are still high performing wealthy kids from elite schools with professional parents\"* and that has been on my mind since, because it is a very good point, and also one that I never really considered before.\n\nSo, fellow pre-meds, thoughts?", "time_ago": "3.1 years ago", "label": 1}, {"bag_id": 47, "orig_id": 20149, "text": "Is schoolhouse a good place to earn volunteering hours? Schoolhouse is a free tutoring service made by khan academy. You can receive tutoring there and provide tutoring there. My explanation was NOT AN advertisement by the way lol. I am wondering if it is good for nonclinical volunteering hours on my application? I could be like a helper on the site for math and provide tutoring to high schoolers on a weekly basis. If it is not, then that is fine; I'll find a soup kitchen near me to stop working", "time_ago": "7 weeks ago", "label": 0}, {"bag_id": 48, "orig_id": 23597, "text": "Non-trad Texas applicant, honest feedback on competitiveness? Hey everyone, looking for some honest outside opinions on where I stand as an applicant.\n\nBackground:\n\n\u2022 Non-traditional premed  \n\u2022 Texas resident (TMDSAS applicant)  \n\u2022 Latino male / URM, immigrant background  \n\u2022 B.S. Psychology, Human Biology minor  \n\u2022 cGPA \\~3.4 with strong upward trend (first semester of college ever I had a 2.6 GPA, but since then I\u2019ve earned only A\u2019s and B\u2019s)\n\nExperiences:\n\n\u2022 \\~5000 hours clinical experience as an ER scribe  \n\u2022 \\~200 hours research + co-author on a publication  \n\u2022 Assistant TA for Bio Lab (\\~200 hours)  \n\u2022 \\~100 hours shadowing (foot & ankle surgery)  \n\u2022 Fluent Spanish speaker  \n\u2022 \\~40 hours volunteering so far (planning to increase before applying)\n\nPlan is to apply broadly to all Texas schools through TMDSAS, plus some DO schools outside Texas, and possibly additional MD programs depending on competitiveness.\n\nI know the MCAT will ultimately determine competitiveness. I haven\u2019t taken it yet but am scheduled for April.\n\nLooking for honest feedback on where I might realistically stand and what would strengthen it most from here.", "time_ago": "5 months ago", "label": 0}, {"bag_id": 49, "orig_id": 15500, "text": "Chads Prep Has anyone used Chads Preps videos? I really like his free videos that he puts out for specific subjects, I was wondering if his MCAT vids are any good? Thanks!", "time_ago": "3 weeks ago", "label": 0}]
+</script>
+
+<script>
+/* ============================================================
+   CONFIG — fill these in before deploying
+   ============================================================ */
+const CONFIG = {
+  // Google Apps Script Web App URL that appends a row per response.
+  // Leave blank to run in "preview" mode (no data is saved anywhere).
+  APPS_SCRIPT_URL: "",  // fill in after setting up this dataset's own Apps Script + Sheet
+
+  // Prolific's completion URL, given to you when you publish the study.
+  // Leave blank to just show a thank-you screen instead of redirecting.
+  COMPLETION_URL: "",  // fill in after setting up this dataset's own CloudResearch project
+
+  N_QUESTIONS: 10,
+  BAG_SIZE: 50,        // must match the number of posts embedded below
+};
+
+/* ============================================================
+   Data + participant params
+   ============================================================ */
+const BAG = JSON.parse(document.getElementById('post-bag-data').textContent);
+const BAG_BY_ID = {};
+BAG.forEach(p => { BAG_BY_ID[p.bag_id] = p; });
+
+function getParam(name){
+  return new URLSearchParams(window.location.search).get(name) || '';
+}
+const PROLIFIC_PID   = getParam('PROLIFIC_PID');
+const STUDY_ID        = getParam('STUDY_ID');
+const SESSION_ID      = getParam('SESSION_ID');
+let PARTICIPANT_ID    = PROLIFIC_PID || '';
+
+function shuffled(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ------------------------------------------------------------
+   Checkout: pull N_QUESTIONS*2 posts from the shared bag WITHOUT
+   REPLACEMENT across sessions, via the Apps Script backend (which
+   tracks used bag_ids in a sheet). Falls back to a local, session-only
+   random draw if no backend is configured or the request fails —
+   that fallback has no cross-session guarantee, it's just so the
+   page still works in preview mode.
+------------------------------------------------------------ */
+async function checkoutFromBag(n){
+  if (CONFIG.APPS_SCRIPT_URL){
+    try {
+      const url = `${CONFIG.APPS_SCRIPT_URL}?action=checkout&n=${n}`;
+      const res = await fetch(url, { method: 'GET' });
+      if (!res.ok) throw new Error('checkout http ' + res.status);
+      const data = await res.json();
+      if (!data || !Array.isArray(data.ids)) throw new Error('bad checkout payload');
+      return data.ids.map(id => BAG_BY_ID[id]).filter(Boolean);
+    } catch (err){
+      console.warn('Bag checkout failed, falling back to local sampling:', err);
+    }
+  }
+  return shuffled(BAG).slice(0, n);
+}
+
+/* Build N_QUESTIONS pairs from 2*N_QUESTIONS checked-out posts, pairing
+   them off two at a time and randomizing left/right per pair. */
+function buildQuestionSet(posts){
+  const qs = [];
+  for (let i = 0; i + 1 < posts.length; i += 2){
+    const p1 = posts[i], p2 = posts[i + 1];
+    const flip = Math.random() < 0.5;
+    const a = flip ? p2 : p1;
+    const b = flip ? p1 : p2;
+    qs.push({
+      bagIdLeft:  a.bag_id,
+      bagIdRight: b.bag_id,
+      left:       a.text,
+      right:      b.text,
+      leftTime:   a.time_ago,
+      rightTime:  b.time_ago,
+      labelLeft:  a.label,   // kept for your later analysis only, never shown
+      labelRight: b.label,
+    });
+  }
+  return qs;
+}
+
+let questionSet = [];
+const responses = [];
+let current = 0;
+let questionStartTime = null;
+
+/* ------------------------------------------------------------
+   Session persistence: so that going back/forward in the browser
+   (or an accidental reload) resumes exactly where the participant
+   left off, instead of restarting from the consent screen.
+   Scoped to sessionStorage (cleared when the tab closes) rather than
+   localStorage, since this should only ever apply to the current
+   attempt, not linger indefinitely on the participant's device.
+------------------------------------------------------------ */
+const PROGRESS_KEY = 'cata_survey_progress_v1';
+
+function saveProgress(){
+  try {
+    sessionStorage.setItem(PROGRESS_KEY, JSON.stringify({
+      participantId: PARTICIPANT_ID,
+      questionSet,
+      current,
+    }));
+  } catch (err){ /* storage unavailable or full; not critical, just skip */ }
+}
+
+function loadProgress(){
+  try {
+    const raw = sessionStorage.getItem(PROGRESS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.questionSet) || parsed.questionSet.length === 0) return null;
+    return parsed;
+  } catch (err){
+    return null;
+  }
+}
+
+function clearProgress(){
+  try { sessionStorage.removeItem(PROGRESS_KEY); } catch (err){}
+}
+
+// Warn before leaving mid-survey (closing the tab, typing a new URL, etc.)
+// so accidental navigation doesn't quietly lose a partially-completed session.
+window.addEventListener('beforeunload', (e) => {
+  const midSurvey = questionSet.length > 0 && current < questionSet.length;
+  if (midSurvey){
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+const resumed = loadProgress();
+
+// Prefetch: fire the checkout request the moment the page loads, so the
+// network round-trip overlaps with the time it takes the participant to
+// read consent + instructions + type their ID, instead of happening after.
+// By the time they click Start this is usually already resolved.
+// Skipped entirely when resuming an existing session, so we don't burn
+// extra posts from the shared bag on a page that's just restoring state.
+const checkoutPromise = resumed ? null : checkoutFromBag(CONFIG.N_QUESTIONS * 2);
+
+/* ============================================================
+   Logging
+   ============================================================ */
+function logResponse(entry){
+  responses.push(entry);
+  if (!CONFIG.APPS_SCRIPT_URL) return;
+
+  const payload = JSON.stringify(entry);
+
+  // sendBeacon fires the request in the background without blocking the UI,
+  // and is specifically designed to still deliver even if the page navigates
+  // away right after — much better fit here than awaiting a fetch, since
+  // Apps Script itself commonly takes 1-3s per call and we don't want the
+  // participant staring at "Saving..." for that whole round trip.
+  if (navigator.sendBeacon){
+    const blob = new Blob([payload], { type: 'text/plain;charset=utf-8' });
+    const ok = navigator.sendBeacon(CONFIG.APPS_SCRIPT_URL, blob);
+    if (ok) return;
+    // fall through to fetch if the beacon couldn't be queued (e.g. payload too large)
+  }
+
+  fetch(CONFIG.APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: payload,
+    keepalive: true, // lets the request outlive a page navigation, similar spirit to sendBeacon
+  }).catch(() => { /* best-effort; keep going even if logging fails */ });
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+const app = document.getElementById('app');
+
+function renderConsent(){
+  app.innerHTML = `
+    <header>
+      <div class="brand">Research Study</div>
+    </header>
+    <div class="panel">
+      <h1 style="font-size:22px;">Consent to Participate</h1>
+      <p>Please read the following and provide your consent to participate in the study at the bottom of this form.</p>
+
+      <p><strong>INTRODUCTION:</strong> Thank you for considering participating in this research project.
+      The purpose of this study is to investigate the ability to predict an outcome from someone's texts on
+      social media. By participating, you will be contributing to advancements in computer science.</p>
+
+      <p>Please note that you have no obligation to participate, and you may decide to terminate your
+      participation at any time. Below is a description of the research project, and your consent to
+      participate. Please read this information carefully.</p>
+
+      <p><strong>BENEFITS AND RISKS:</strong> Your participation will contribute to research aimed at
+      understanding how people predict outcome and whether this is similar to how computers predict outcome.
+      There are minimal risks associated with participating in this study.</p>
+
+      <p><strong>Anonymity:</strong> No identifying information about you will be collected, except your
+      CrowdResearch user name.</p>
+
+      <p><strong>PROCEDURES:</strong> If you choose to participate in this research project you will be
+      shown ${CONFIG.N_QUESTIONS} pairs of social media posts and asked to choose one of them according to
+      specific guidelines. Completing this task should take 10 minutes or less.</p>
+
+      <p><strong>RESEARCH DATA &amp; FEEDBACK:</strong> By participating in this research project, you
+      confirm that you understand the purpose of the research and consent to participate voluntarily. Your
+      participation is entirely voluntary, and you have the right to withdraw at any time without providing
+      a reason.</p>
+
+      <p>By signing, you confirm that you understand what the project is about and agree to adhere to the
+      ethical guidelines regarding the use of the provided data. Should you have any questions concerning
+      this project, please contact the supervising researcher, Elad Yom-Tov, at
+      <a href="mailto:elad.yom-tov@biu.ac.il" style="color:var(--accent);">elad.yom-tov@biu.ac.il</a>.</p>
+
+      <p>Please print this page for your records.</p>
+
+      <p>Thank you for considering participation in this research project. Your contribution is greatly
+      appreciated.</p>
+
+      <p style="font-size:13px; color:var(--ink-soft);">By clicking the button below you agree to the terms above.</p>
+
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:6px;">
+        <button class="btn" id="consent-btn">I agree to participate</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('consent-btn').addEventListener('click', () => {
+    renderIntro();
+  });
+}
+
+function renderIntro(){
+  app.innerHTML = `
+    <header>
+      <div class="brand">Reading Task</div>
+    </header>
+    <div class="panel">
+      <h1>Who gets in?</h1>
+      <p>You'll see ${CONFIG.N_QUESTIONS} pairs of short posts written by different Reddit users,
+      each with a note on when it was written. For each pair, pick the person you think is
+      <strong>more likely to be getting married soon</strong>.</p>
+      <ul>
+        <li>There's no single "correct" answer &mdash; go with your honest first read.</li>
+        <li>Posts are shown exactly as written, so spelling and formatting may vary.</li>
+        <li>Takes about 3&ndash;4 minutes.</li>
+      </ul>
+      <label for="user-id-input" style="display:block; margin-top:22px; font-size:13px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em;">
+        Your participant / user ID
+      </label>
+      <input
+        id="user-id-input"
+        type="text"
+        placeholder="Enter the ID you were given"
+        value="${PARTICIPANT_ID}"
+        style="width:100%; margin-top:8px; padding:11px 14px; font-size:15px; font-family:inherit;
+               border:1.5px solid var(--line); border-radius:8px; background:#fff; color:var(--ink);"
+      />
+      <div id="user-id-error" style="color:var(--danger); font-size:13px; margin-top:6px; min-height:18px;"></div>
+      <button class="btn" id="start-btn">Start</button>
+    </div>
+  `;
+  const input = document.getElementById('user-id-input');
+  const error = document.getElementById('user-id-error');
+  const startBtn = document.getElementById('start-btn');
+  startBtn.addEventListener('click', async () => {
+    const val = input.value.trim();
+    if (!val){
+      error.textContent = 'Please enter your participant ID before starting.';
+      input.focus();
+      return;
+    }
+    PARTICIPANT_ID = val;
+    startBtn.disabled = true;
+    startBtn.textContent = 'Loading…';
+    error.textContent = '';
+    try {
+      const posts = await (checkoutPromise || checkoutFromBag(CONFIG.N_QUESTIONS * 2));
+      if (posts.length < 2){
+        error.textContent = 'Could not load posts right now. Please try again in a moment.';
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start';
+        return;
+      }
+      questionSet = buildQuestionSet(posts);
+      current = 0;
+      saveProgress();
+      renderQuestion();
+    } catch (err){
+      console.error(err);
+      error.textContent = 'Something went wrong loading the task. Please try again.';
+      startBtn.disabled = false;
+      startBtn.textContent = 'Start';
+    }
+  });
+}
+
+function renderProgress(){
+  const segs = Array.from({length: CONFIG.N_QUESTIONS}, (_, i) => {
+    const cls = i < current ? 'done' : (i === current ? 'current' : '');
+    return `<div class="progress-seg ${cls}"></div>`;
+  }).join('');
+  return `
+    <div class="progress-track">${segs}</div>
+    <div class="progress-label">Question ${current + 1} of ${CONFIG.N_QUESTIONS}</div>
+  `;
+}
+
+function renderQuestion(){
+  if (current >= questionSet.length){
+    return renderEnd();
+  }
+  const q = questionSet[current];
+  questionStartTime = performance.now();
+
+  app.innerHTML = `
+    <header>
+      <div class="brand">Reading Task</div>
+      ${renderProgress()}
+    </header>
+    <div class="question">Which person is more likely to get accepted into medical school?</div>
+    <div class="subtext">Read what each person wrote and when they wrote it, then choose.</div>
+    <div class="cards">
+      <div class="card" data-side="left">
+        <div class="card-label">Person A &middot; <span class="card-time"></span></div>
+        <div class="card-text"></div>
+      </div>
+      <div class="card" data-side="right">
+        <div class="card-label">Person B &middot; <span class="card-time"></span></div>
+        <div class="card-text"></div>
+      </div>
+    </div>
+    <div class="status-row" id="status-row"></div>
+  `;
+  // set text via textContent to avoid any HTML-injection concerns from post text
+  app.querySelector('[data-side="left"] .card-text').textContent = q.left;
+  app.querySelector('[data-side="right"] .card-text').textContent = q.right;
+  app.querySelector('[data-side="left"] .card-time').textContent = `written ${q.leftTime}`;
+  app.querySelector('[data-side="right"] .card-time').textContent = `written ${q.rightTime}`;
+
+  const cards = app.querySelectorAll('.card');
+  cards.forEach(card => {
+    card.addEventListener('click', () => handleChoice(card.dataset.side, cards));
+  });
+}
+
+function handleChoice(side, cards){
+  cards.forEach(c => {
+    c.classList.toggle('selected', c.dataset.side === side);
+    c.classList.toggle('dimmed', c.dataset.side !== side);
+  });
+  const q = questionSet[current];
+  const rtMs = Math.round(performance.now() - questionStartTime);
+  const chosenBagId = side === 'left' ? q.bagIdLeft : q.bagIdRight;
+  const chosenLabel  = side === 'left' ? q.labelLeft : q.labelRight;
+
+  const entry = {
+    participant_id: PARTICIPANT_ID,
+    study_id: STUDY_ID,
+    session_id: SESSION_ID,
+    bag_id_left: q.bagIdLeft,
+    bag_id_right: q.bagIdRight,
+    question_index: current,
+    chosen_side: side,
+    chosen_bag_id: chosenBagId,
+    chosen_label: chosenLabel,
+    reaction_time_ms: rtMs,
+    timestamp: new Date().toISOString(),
+  };
+
+  const isLast = current === questionSet.length - 1;
+  logResponse(entry); // fires in the background, doesn't block the UI
+  setTimeout(() => {
+    current += 1;
+    saveProgress();
+    renderQuestion();
+  }, isLast ? 120 : 60);
+}
+
+function renderEnd(){
+  const redirect = CONFIG.COMPLETION_URL;
+  app.innerHTML = `
+    <div class="panel" style="text-align:center;">
+      <div class="end-icon">✓</div>
+      <h1 style="text-align:center;">Thank you!</h1>
+      <p>Your responses have been recorded. That's everything for this task.</p>
+      ${redirect
+        ? `<a class="btn" id="continue-btn" href="${redirect}" style="text-decoration:none; display:inline-block;">Continue</a>`
+        : '<p class="fine-print">A link back to the study platform will be added here before this goes live &mdash; for now you can just close this tab.</p>'}
+      ${!CONFIG.APPS_SCRIPT_URL
+        ? '<p class="fine-print">Preview mode: APPS_SCRIPT_URL is not configured, so nothing was actually saved. Responses collected this session are logged to the browser console.</p>'
+        : ''}
+    </div>
+  `;
+  if (!CONFIG.APPS_SCRIPT_URL){
+    console.log('Session responses (preview mode):', responses);
+  }
+}
+
+if (resumed){
+  PARTICIPANT_ID = resumed.participantId || PARTICIPANT_ID;
+  questionSet = resumed.questionSet;
+  current = resumed.current;
+  renderQuestion(); // if current >= questionSet.length this naturally shows the thank-you screen
+} else {
+  renderConsent();
+}
+</script>
+</body>
+</html>
